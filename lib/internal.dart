@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:crud/auth.dart';
 
 class Internal extends StatefulWidget {
   const Internal({super.key});
@@ -8,6 +10,11 @@ class Internal extends StatefulWidget {
 }
 
 class _InternalState extends State<Internal> {
+
+  String getCurrentUserName() {
+    return FirebaseAuth.instance.currentUser?.displayName ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +49,7 @@ class _InternalState extends State<Internal> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("Seja bem-vindo, sr(a) "),
-                    Text("Pessoa", style: TextStyle(color: Colors.red)),
+                    Text(getCurrentUserName(), style: TextStyle(color: Colors.red)),
                   ],
                 ),
               ),
@@ -51,7 +58,9 @@ class _InternalState extends State<Internal> {
                 child: Divider(color: Colors.black),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  AuthService().signOut();
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   shape: RoundedRectangleBorder(

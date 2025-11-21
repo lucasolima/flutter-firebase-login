@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:crud/auth.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -10,7 +11,13 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   bool isLoginPage = true;
 
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +51,7 @@ class _LoginState extends State<Login> {
                 ),
                 SizedBox(height: 20),
                 TextFormField(
+                  controller: _emailController,
                   validator: (String? value) {
                     if (value == null) {
                       return 'Por favor, insira seu email';
@@ -71,6 +79,7 @@ class _LoginState extends State<Login> {
                 ),
                 SizedBox(height: 5),
                 TextFormField(
+                  controller: _passwordController,
                   validator: (String? value) {
                     if (value == null) {
                       return 'Por favor, insira sua senha';
@@ -96,32 +105,9 @@ class _LoginState extends State<Login> {
                   visible: !isLoginPage,
                   child: Column(
                     children: [
-                      TextFormField(
-                        validator: (String? value) {
-                          if (value == null) {
-                            return 'Por favor, confirme sua senha';
-                          }
-                          if (value.length < 8) {
-                            return 'A senha deve ter pelo menos 8 caracteres';
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Confirme a Senha",
-                          fillColor: Colors.white,
-                          filled: true,
-                          hintStyle: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        obscureText: true,
-                      ),
                       SizedBox(height: 5),
                       TextFormField(
+                        controller: _nameController,
                         validator: (String? value) {
                           if (value == null) {
                             return 'Por favor, insira seu nome completo';
@@ -153,7 +139,9 @@ class _LoginState extends State<Login> {
                     height: 40,
                     width: 200,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        executeLogin();
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: (isLoginPage)
                             ? Colors.red
@@ -186,5 +174,27 @@ class _LoginState extends State<Login> {
         ),
       ),
     );
+  }
+
+  void executeLogin() {
+    String email = _emailController.text;
+    String password = _passwordController.text;
+    String name = _nameController.text;
+
+    if (_formKey.currentState!.validate()) {
+      if (isLoginPage) {
+        print("Entrada válida");
+        _authService.signIn(email: email, password: password);
+      } else {
+        print("Cadastro válido");
+        print("Nome: ${_nameController.text}");
+        print("Email: ${_emailController.text}");
+        print("Senha: ${_passwordController.text}");
+
+        _authService.registerUser(email: email, password: password, name: name);
+      }
+    } else {
+      print("Entrada inválida");
+    }
   }
 }
